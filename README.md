@@ -1,3 +1,7 @@
+Just an example of common gopher mistake - using gorutines on loop iterator variable; Probably each gorutine will use
+the same loop value (set after the end of loop but before the gorutines started execution).
+See https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
+
 Test can be run by `go test . -v -failfast -count=1` Flag `-count` is used here to prevent caching of test results.
 
 Using go version go1.11.5 (linux/amd64) and Intel® Core™ i5-8300H CPU @ 2.30GHz × 8 the test is often failed by unclear 

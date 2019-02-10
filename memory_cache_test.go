@@ -30,10 +30,16 @@ func TestMemoryCache_GetConcurrently(t *testing.T) {
 	for i := 1; i <= run; i++ {
 		wg.Add(len(data))
 		for key, value := range data {
-			go func() {
-				cache.Set(key, value)
-				wg.Done()
-			}()
+			// Common gopher mistake - using gorutines on loop iterator variable - probably each gorutine will use
+			// the same loop value (set after the end of loop but before the gorutines started execution)
+			// See https://github.com/golang/go/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
+			// Can be fixed declaring and using new variables in loop body as they
+			// will not be shared between iterations:
+			//   key, value := key, value
+			// We can fix it also passing (key, value) as parameters to the closure, so they will be placed
+			// on the stack for the gorutine, and they will not be shared in loop body:
+			// go func(key, value string) {cache.Set(key, value); wg.Done()}(key, value)
+			go func() {cache.Set(key, value); wg.Done()}()
 		}
 	}
 
